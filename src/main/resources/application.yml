@@ -1,0 +1,48 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: nutritionist-service
+          uri: lb://nutritionist-service
+          predicates:
+            - Path=/nutritionist/**, /professional-profile/**, /specialty/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: nutritionist-service
+                fallbackuri: forward:/nutritionistFallBack
+        - id: patient-service
+          uri: lb://patient-service
+          predicates:
+            - Path=/patient/**, /bill/**, /payment-method/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: patient-service
+                fallbackuri: forward:/patientFallBack
+        - id: publication-service
+          uri: lb://publication-service
+          predicates:
+            - Path=/recommendation/**, /recipe/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: publication-service
+                fallbackuri: forward:/publicationFallBack
+        - id: appointment-service
+          uri: lb://appointment-service
+          predicates:
+            - Path=/appointment/**, /diet/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: appointment-service
+                fallbackuri: forward:/appointmentFallBack
+
+hystrix:
+  command:
+    fallbackcmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
