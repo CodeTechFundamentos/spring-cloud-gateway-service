@@ -1,9 +1,12 @@
 spring:
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
       routes:
-        - id: nutritionist-service
-          uri: lb://nutritionist-service
+        - id: NUTRIX-NUTRITIONIST-SERVICE
+          uri: lb://NUTRIX-NUTRITIONIST-SERVICE
           predicates:
             - Path=/nutritionist/**, /professional-profile/**, /specialty/**
           filters:
@@ -11,8 +14,8 @@ spring:
               args:
                 name: nutritionist-service
                 fallbackuri: forward:/nutritionistFallBack
-        - id: patient-service
-          uri: lb://patient-service
+        - id: NUTRIX-PATIENT-SERVICE
+          uri: lb://NUTRIX-PATIENT-SERVICE
           predicates:
             - Path=/patient/**, /bill/**, /payment-method/**
           filters:
@@ -20,8 +23,8 @@ spring:
               args:
                 name: patient-service
                 fallbackuri: forward:/patientFallBack
-        - id: publication-service
-          uri: lb://publication-service
+        - id: NUTRIX-PUBLICATION-SERVICE
+          uri: lb://NUTRIX-PUBLICATION-SERVICE
           predicates:
             - Path=/recommendation/**, /recipe/**
           filters:
@@ -29,8 +32,8 @@ spring:
               args:
                 name: publication-service
                 fallbackuri: forward:/publicationFallBack
-        - id: appointment-service
-          uri: lb://appointment-service
+        - id: NUTRIX-APPOINTMENT-SERVICE
+          uri: lb://NUTRIX-APPOINTMENT-SERVICE
           predicates:
             - Path=/appointment/**, /diet/**
           filters:
@@ -38,11 +41,6 @@ spring:
               args:
                 name: appointment-service
                 fallbackuri: forward:/appointmentFallBack
-
-hystrix:
-  command:
-    fallbackcmd:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 5000
+  config:
+    import:
+      optional:configserver:http://localhost:9196
