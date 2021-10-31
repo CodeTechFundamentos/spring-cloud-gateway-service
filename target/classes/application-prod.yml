@@ -1,0 +1,46 @@
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: NUTRIX-NUTRITIONIST-SERVICE
+          uri: https://nutrix-nutritionist-service.mybluemix.net/
+          predicates:
+            - Path=/nutritionist/**, /professional-profile/**, /specialty/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: nutritionist-service
+                fallbackuri: forward:/nutritionistFallBack
+        - id: NUTRIX-PATIENT-SERVICE
+          uri: https://nutrix-patient-service.mybluemix.net/
+          predicates:
+            - Path=/patient/**, /bill/**, /payment-method/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: patient-service
+                fallbackuri: forward:/patientFallBack
+        - id: NUTRIX-PUBLICATION-SERVICE
+          uri: https://nutrix-publication-service.mybluemix.net/
+          predicates:
+            - Path=/recommendation/**, /recipe/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: publication-service
+                fallbackuri: forward:/publicationFallBack
+        - id: NUTRIX-APPOINTMENT-SERVICE
+          uri: https://nutrix-appointment-service.mybluemix.net/
+          predicates:
+            - Path=/appointment/**, /diet/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: appointment-service
+                fallbackuri: forward:/appointmentFallBack
+  config:
+    import:
+      optional:configserver:https://nutrix-config-service.mybluemix.net/

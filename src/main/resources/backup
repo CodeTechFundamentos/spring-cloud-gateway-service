@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: nutritionist-service
+          uri: lb://nutritionist-service
+          predicates:
+            - Path=/nutritionist/**, /professional-profile/**, /specialty/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: nutritionist-service
+                fallbackuri: forward:/nutritionistFallBack
+        - id: patient-service
+          uri: lb://patient-service
+          predicates:
+            - Path=/patient/**, /bill/**, /payment-method/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: patient-service
+                fallbackuri: forward:/patientFallBack
+        - id: publication-service
+          uri: https://nutrix-registry-service.mybluemix.net/publication-service
+          #uri: https://publication-service.mybluemix.net
+          predicates:
+            - Path=/recommendation/**, /recipe/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: publication-service
+                fallbackuri: forward:/publicationFallBack
+        - id: appointment-service
+          uri: lb://appointment-service
+          predicates:
+            - Path=/appointment/**, /diet/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: appointment-service
+                fallbackuri: forward:/appointmentFallBack
+
+  config:
+    import:
+      optional:configserver:https://nutrix-config-server.mybluemix.net/
+
+server:
+  port: 8989
+
+eureka:
+  client:
+    instance:
+      hostname: gateway-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
+
+hystrix:
+  command:
+    fallbackcmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
